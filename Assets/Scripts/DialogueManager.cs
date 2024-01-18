@@ -12,11 +12,14 @@ public class DialogueManager : MonoBehaviour
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI dialogueText;
     public GameObject dialogueBar;
+    public GameManager gm;
+    public bool start;
 
     // Start is called before the first frame update
     void Start()
     {
         sentences = new Queue<string>();
+        start = false;
     }
 
     // Update is called once per frame
@@ -43,6 +46,10 @@ public class DialogueManager : MonoBehaviour
 
         DisplayNextSentence();
         dialogue.source.Stop();
+        if (dialogue.name == "Evil Wizard")
+        {
+            start = true;
+        }
     }
 
     public void DisplayNextSentence()
@@ -60,5 +67,9 @@ public class DialogueManager : MonoBehaviour
     {
         dialogueBar.gameObject.SetActive(false);
         Time.timeScale= 1;
+        if (start)
+        {
+            gm.start = true;
+        }
     }
 }
