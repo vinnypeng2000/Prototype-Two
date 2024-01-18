@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed;
     public Rigidbody2D rb;
     public float jumpForce;
-    private bool jumped;
+    public bool jumped;
     public bool onGround;
     public Collider2D terrain;
     public ContactFilter2D terrtainFilter;
@@ -44,63 +44,25 @@ public class PlayerMovement : MonoBehaviour
         }
  
         // rb.AddForce(new Vector2 (moveHorizontal * moveSpeed, rb.velocity.y), ForceMode2D.Force);
-
-        if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            move = true;
-        }
-        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.RightArrow))
-        
-        {
-            move = false;
-        }
-
-        if (move)
-        {
-            animator.SetBool("Move", true);
-        }
-        else
-        {
-            animator.SetBool("Move", false);
-        }
+        animator.SetBool("Move", !Mathf.Approximately(moveHorizontal, 0));
 
         rb.velocity = new Vector2(moveHorizontal * moveSpeed, rb.velocity.y);
-        
-        if (jumped)
+
+        if (onGround && Input.GetKeyDown(KeyCode.Space))
         {
-            jumped = false;
             rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
             animator.SetBool("Jump", true);
             animator.SetBool("Move", false);
-            if (Input.GetKeyDown(KeyCode.J))
-            {
-                attack = true;
-                animator.SetBool("Attack", true);
-                animator.SetBool("Jump", false);
-            }
-            if (Input.GetKeyUp(KeyCode.J))
-            {
-                attack = false;
-                animator.SetBool("Attack", false);
-                animator.SetBool("Jump", false);
-            }
-        }
-        else
-        {
-            animator.SetBool("Jump", false);
+            onGround = false;
+            // jumped = true;
         }
 
-        onGround = terrain.IsTouching(terrtainFilter);
-
-        if (!jumped && Input.GetKeyDown(KeyCode.Space) && onGround)
-            jumped = true;
-
-        if (Input.GetKeyDown(KeyCode.J))
+        if (Input.GetKey(KeyCode.J) || Input.GetKey(KeyCode.Mouse0))
         {
             attack = true;
             animator.SetBool("Attack", true);
         }
-        if (Input.GetKeyUp(KeyCode.J))
+        else
         {
             attack = false;
             animator.SetBool("Attack", false);
@@ -108,14 +70,12 @@ public class PlayerMovement : MonoBehaviour
 
     }
 
-    // void FixedUpdate()
-    // {
-    //     rb.velocity = new Vector2(moveHorizontal * moveSpeed, rb.velocity.y);
-        
-    //     if (jumped)
-    //     {
-    //         jumped = false;
-    //         rb.AddForce(Vector2.Up * jumpForce, ForceMode2D.Impulse);
-    //     }
-    // }
+    void OnCollisionEnter2D(Collision2D collision) 
+    { 
+        if (collision.gameObject.CompareTag("Terrain")) 
+        { 
+            onGround = true;
+            animator.SetBool("Jump", false);
+        } 
+    } 
 }
